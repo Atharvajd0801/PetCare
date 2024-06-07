@@ -19,7 +19,7 @@ import { GetPasswordAndUpdate } from "./components/sign up page/GetPasswordAndUp
 import { Signup } from "./components/sign up page/signup";
 import { ProductPage } from "./Pages/product page/productpage";
 import Medicare from "./components/Medicare/Medicare";
-
+import FosterCare from "./Pages/FosterCare";
 function Allroutes() {
   return (
     <Authentication>
@@ -43,6 +43,7 @@ function Allroutes() {
             <Route path="/petdetail" element={<Petdetails />} />
             <Route path="/medicare" element={<Medicare />} />
             <Route path="/forgetpassword" element={<Forgetpassword />} />
+            <Route path="FosterCare" element={<FosterCare />} />
             <Route
               path="signup/getPassword"
               element={<GetPasswordAndUpdate />}
@@ -53,11 +54,11 @@ function Allroutes() {
             <Route path="/products" element={<Product />} />
             <Route path = "/products/:id" element = {<ProductPage/>} />
             <Route path="/doctor" element={<Doctor />} />
-            <Route path="/doctor/:id" element={<Doctordetails />} />
+            <Route exact path="/doctor/detail" element={<Doctordetails />} />
           </Routes>
         </Cart>
       </GoogleAuthendication>
     </Authentication>
   );
 }
-export default Allroutes;
+export default Allroutes;

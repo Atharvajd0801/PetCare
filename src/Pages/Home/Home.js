@@ -24,7 +24,7 @@ export const Home = () => {
               home-like environment for your pet
             </p>
             <p className="imagequotes">
-              <span>We can take care of your</span>
+              <span>We can take care of your pet</span>
             </p>
             <div className="pets">
               <img src={pet1} alt="pet1"></img>
@@ -49,8 +49,7 @@ export const Home = () => {
         </div>
         <div>
           <p className="d-flex justify-content-center">
-            Our websites may also offer services such as online pet stores, pet
-            adoption, pet sitting, and veterinary care directories.
+            Our website may also offer services such as online pet stores, pet foster care and veterinary care directories.
           </p>
         </div>
         <br></br>

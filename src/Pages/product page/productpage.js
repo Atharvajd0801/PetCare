@@ -8,6 +8,8 @@ import { Loading } from "../../components/loading/Loading";
 import { useCartAuth } from "../Product/Cart";
 import { Cell, Heading } from "./product-page-styled-component";
 import "./productpage.css";
+import { products } from "../Product/constant";
+
 
 export const ProductPage = () => {
   // This is to display the description of the prodcut in the product page
@@ -17,93 +19,101 @@ export const ProductPage = () => {
   const [heading, setHeading] = useState("");
   const [rating, setRating] = useState("");
   const [cost, setCost] = useState("");
+
+
   const parameter = useParams();
 
+
+  const productDetail = products[(parameter.id)-1];
+
+
+  console.log(productDetail);
+  
   // To update the number of things ordered by the person
   const cartAuth = useCartAuth();
+
   // This is for the loading container
   const [isLoading, setLoading] = useState(false);
 
   // This is to get the data from server and then display the details in the product page
   useEffect(() => {
     setLoading(true);
-    console.log(parameter);
-    axios
-      .get(`https://rich-gray-macaw-sock.cyclic.app/api/product/${parameter.id}`)
-      .then((res) => {
-        res = res.data;
-        console.log(res);
-        setImageContainer(
-          <>
-            <div>
-              <img
-                src={res.photos}
-                alt="image"
-                className="product-page-image"
-              ></img>
-              <div className="">
-                <Button
-                  variant="primary"
-                  className="product-page-button"
-                  style={{ marginRight: 50 }}
-                  onClick={() => console.log("Primary")}
-                >
-                  Add to cart
-                </Button>
-                <Button
-                  variant="outline-primary"
-                  className="product-page-button"
-                  onClick={() => console.log("Primary")}
-                >
-                  Buy now
-                </Button>
-              </div>
+
+    setImageContainer(
+      <>
+        <div>
+          <img
+            src={productDetail.photos}
+            alt="image"
+            className="product-page-image"
+          ></img>
+          <div className="">
+            <Button
+              variant="primary"
+              className="product-page-button"
+              style={{ marginRight: 50 }}
+              onClick={() => console.log("Primary")}
+            >
+              Add to cart
+            </Button>
+            <Button
+              variant="outline-primary"
+              className="product-page-button"
+              onClick={() => console.log("Primary")}
+            >
+              Buy now
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+    
+    setHeading(productDetail.productName);
+    setRating(productDetail.rating);
+    setCost(productDetail.cost);
+    setDescriptionDisplay(
+      <>
+        <h4>Product Description</h4>
+        {productDetail.description.map((item, index) => (
+          <div
+            className="product-page-highlight-description-container"
+            key={index}
+          >
+            <h4 style={{ marginTop: 5, marginBottom: 0 }}>{item.title}</h4>
+            <div style={{ marginBottom: 8 }}>
+              <span>{item.value}</span>
             </div>
-          </>
-        );
-        setHeading(res.productname);
-        setRating(res.rating);
-        setCost(res.cost);
-        setDescriptionDisplay(
-          <>
-            <h4>Product Description</h4>
-            {res.description.map((item, index) => (
-              <div
-                className="product-page-highlight-description-container"
-                key={index}
-              >
-                <h4 style={{ marginTop: 5, marginBottom: 0 }}>{item.tittle}</h4>
-                <div style={{ marginBottom: 8 }}>
-                  <span>{item.value}</span>
-                </div>
-              </div>
-            ))}
-          </>
-        );
-        setSpecificationDisplay(
-          <>
-            <h4>Specifications</h4>
-            {res.specification.map((item, index) => (
-              <div key={index}>
-                <h5>{item.tittle}</h5>
-                <table>
-                  <tbody>
-                    {item.specificationList.map((secondItem, secondIndex) => (
-                      <tr key={secondIndex}>
-                        <Cell>{secondItem.tittle}</Cell>
-                        <Cell>{secondItem.value}</Cell>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
-          </>
-        );
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
+          </div>
+        ))}
+      </>
+    );
+
+    setSpecificationDisplay(
+      <>
+        <h4>Specifications</h4>
+        {productDetail.specification.map((item, index) => (
+          <div key={index}>
+            <h5>{item.title}</h5>
+            <table>
+              <tbody>
+                {item.specificationList.map((secondItem, secondIndex) => (
+                  <tr key={secondIndex}>
+                    <Cell>{secondItem.title}</Cell>
+                    <Cell>{secondItem.value}</Cell>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </>
+    );
+
+    setLoading(false);
+
   }, []);
+
+
 
   const addToCart = (event) => {
     const id = event.target.value;
@@ -118,6 +128,7 @@ export const ProductPage = () => {
   const buyNow = (event) => {
     console.log(event.target.value);
   };
+
 
   return (
     <>

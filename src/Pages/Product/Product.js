@@ -1,105 +1,208 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import { Loading } from "../../components/loading/Loading";
-import { useCartAuth } from "./Cart";
+import { useCartAuth } from "./Cart"; // Ensure this path is correct
 import "./Product.css";
-var prev_size = 0;
+import debounce from "lodash.debounce";
+
+const staticProductData = [
+  {
+    _id: "1",
+    productname: "Premium Dog Food",
+    cost: 100,
+    photos: "https://www.puprise.com/wp-content/uploads/2023/07/1213-calibra-dog-premium-puppy-junior-12kg.webp",
+  },
+  {
+    _id: "2",
+    productname: "Gourmet Cat Food",
+    cost: 150,
+    photos: "https://static.miscota.com/media/1/photos/products/187853/187853-gold-terrine-de-pollo-2-2-jpeg_1_g.jpeg",
+  },
+  {
+    _id: "3",
+    productname: "Small Pet Food Mix",
+    cost: 200,
+    photos: "https://www.petkonnect.in/cdn/shop/products/PK2022_19KB3Xf7RsZD7cFOHzzhxrBGaClS8A8KSeyLekDf.jpg?v=1662117634&width=823",
+  },
+  {
+    _id: "4",
+    productname: "Interactive Dog Toy",
+    cost: 250,
+    photos: "https://qpets.in/cdn/shop/products/rB-aqGMHLVqAEJSoAAgD4S-Y4Hc994_823x.jpg?v=1678957807",
+  },
+  {
+    _id: "5",
+    productname: "Catnip Toy",
+    cost: 300,
+    photos: "https://m.media-amazon.com/images/I/51ZYjJuowLL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "6",
+    productname: "Pet Carrier",
+    cost: 350,
+    photos: "https://m.media-amazon.com/images/I/41PEmTDRCfL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "7",
+    productname: "Pet Bed",
+    cost: 400,
+    photos: "https://www.adairs.com.au/globalassets/13.-ecommerce/03.-product-images/2022_images/homewares/pets/53107_forest_zoom_1.jpg?width=800&mode=crop&heightratio=1&quality=80",
+  },
+  {
+    _id: "8",
+    productname: "Pet Water Fountain",
+    cost: 450,
+    photos: "https://m.media-amazon.com/images/I/51uXQbRw1vL._AC_SL1500_.jpg",
+  },
+  {
+    _id: "9",
+    productname: "Pet Shampoo",
+    cost: 500,
+    photos: "https://m.media-amazon.com/images/I/41xa3thh7qL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "10",
+    productname: "Bird Seed Mix",
+    cost: 550,
+    photos: "https://images-cdn.ubuy.co.in/644528c773de1b2c6577fb0d-schoen-farms-finch-small-wild-bird.jpg",
+  },
+  {
+    _id: "11",
+    productname: "Fish Tank Filter",
+    cost: 550,
+    photos: "https://s7cdn.spectrumbrands.com/~/media/Pet/Tetra/Images/Learning%20Centers/Fish%20Learning%20Center/Power%20Filters.jpg",
+  },
+  {
+    _id: "12",
+    productname: "Reptile Heat Lamp",
+    cost: 550,
+    photos: "https://www.petcity.com.au/assets/full/9325136076059.jpg?20200703041341",
+  },
+];
 
 export const Product = () => {
   const cartAuth = useCartAuth();
   const [, setSortingOption] = useState("Alphabetical");
   const [dataList, setDataList] = useState([]);
+  const [filteredDataList, setFilteredDataList] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isLoading, setLoading] = useState(false);
-
-  //   To route the page
   const navigate = useNavigate();
+
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get("https://rich-gray-macaw-sock.cyclic.app/api/product")
-      .then((response) => {
-        setDataList(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-      });
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Simulating API call with static data
+      const response = staticProductData;
+      setDataList(response);
+      setFilteredDataList(response);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addToCart = (event) => {
     const id = event.target.value;
-    console.log(id);
-    axios
-      .get("http://localhost:8000/api/product/getCartItems", {
-        id: id,
-      })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+    console.log("Adding to cart:", id); // Check if this log appears in the console
+  
+    // Check if the product already exists in the cart
+    const existingProductIndex = cartAuth.cartList.findIndex(item => item.id === id);
+  
+    if (existingProductIndex !== -1) {
+      // If the product already exists, update its quantity
+      const updatedCartList = [...cartAuth.cartList];
+      updatedCartList[existingProductIndex].count += 1;
+      cartAuth.setCartList(updatedCartList);
+    } else {
+      // If the product is not in the cart, add it with quantity 1
+      cartAuth.setCartList([...cartAuth.cartList, { id: id, count: 1 }]);
+    }
   };
+  
+
   const buyNow = (event) => {
-    console.log(event.target.value);
+    const id = event.target.value;
+    console.log("Buying now:", id); // Check if this log appears in the console
+  
+    // Check if the product already exists in the cart
+    const existingProductIndex = cartAuth.cartList.findIndex(item => item.id === id);
+  
+    if (existingProductIndex !== -1) {
+      // If the product already exists, update its quantity
+      const updatedCartList = [...cartAuth.cartList];
+      updatedCartList[existingProductIndex].count += 1;
+      cartAuth.setCartList(updatedCartList);
+    } else {
+      // If the product is not in the cart, add it to the cart with a quantity of 1
+      cartAuth.setCartList([...cartAuth.cartList, { id: id, count: 1 }]);
+    }
+  
+    // After adding to cart, navigate to the checkout or cart page
+    navigate("/cart"); // Update this with the appropriate navigation path
   };
-  // This function will invoke when there is a change in the sort and updateds the data in the page
+  
+
   const optionChange = (event) => {
-    setSortingOption(event.target.value);
-    switch (event.target.value) {
+    const sortOption = event.target.value;
+    setSortingOption(sortOption);
+    let sortedList = [...filteredDataList];
+    switch (sortOption) {
       case "alphabetical":
-        dataList.sort((a, b) => {
-          if (a.productname < b.productname) return -1;
-          else if (a.productname > b.productname) return 1;
-          return 0;
-        });
+        sortedList.sort((a, b) => a.productname.localeCompare(b.productname));
         break;
       case "low to high":
-        dataList.sort((a, b) => a.cost - b.cost);
+        sortedList.sort((a, b) => a.cost - b.cost);
         break;
       case "high to low":
-        dataList.sort((a, b) => b.cost - a.cost);
+        sortedList.sort((a, b) => b.cost - a.cost);
         break;
       default:
         break;
     }
-  };
-  //This function will invoke when the search button is pressed
-  const searchThisItem = () => {
-    let search = searchText.toLowerCase();
-    if (prev_size > search.length) {
-      axios
-        .get("https://rich-gray-macaw-sock.cyclic.app/api/product")
-        .then((response) => setDataList(response.data))
-        .catch((error) => console.log(error));
-    }
-    prev_size = search.length;
-    let lst = [];
-    for (let i = 0; i < dataList.length; i++) {
-      let val = dataList[i].productname.toLowerCase();
-      if (val.indexOf(search) !== -1) lst.push(dataList[i]);
-    }
-    setDataList(lst);
+    setFilteredDataList(sortedList);
   };
 
-  //   function to navigate the page to product page
+  const searchItems = useCallback(
+    debounce((search) => {
+      let filteredList = dataList.filter(item =>
+        item.productname.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredDataList(filteredList);
+    }, 300),
+    [dataList]
+  );
+
+  const handleSearchChange = (event) => {
+    const search = event.target.value;
+    setSearchText(search);
+    searchItems(search);
+  };
+
   const divContainerClick = (id) => {
-    navigate(`/products/${id}`);
+    navigate(id);
   };
 
-  const displayAllData = dataList.map((x, index) => (
+  const displayAllData = filteredDataList.map((x) => (
     <div key={x._id} className="product-container">
       <div onClick={() => divContainerClick(x._id)}>
-        <img className="convert-image" src={x.photos} alt={""}></img>
-        <br></br>
+        <img className="convert-image" src={x.photos} alt={x.productname} />
+        <br />
         <div id="product-page-data-container">
           <div id="product-container-product-name">{x.productname}</div>
           <div id="product-container-price-container">MRP₹-{x.cost}</div>
         </div>
       </div>
-      <button value={x._id} onClick={(event) => addToCart(event)}>
+      <button value={x._id} onClick={addToCart}>
         Add to Cart
       </button>
-      <button value={x._id} onClick={(event) => buyNow(event)}>
+      <button value={x._id} onClick={buyNow}>
         Buy Now
       </button>
     </div>
@@ -114,26 +217,23 @@ export const Product = () => {
       ) : (
         <>
           <div>
-            <Navbar></Navbar>{" "}
+            <Navbar />
           </div>
           <div id="product-page-all-container">
             <div id="product-page-nav-container">
               <div id="product-page-nav-total-data-container">
-                <span>Showing {dataList.length} items</span>
+                <span>Showing {filteredDataList.length} items</span>
               </div>
-              <div id="product-page-nav-serach-container">
+              <div id="product-page-nav-search-container">
                 <span>Search</span>
                 <input
-                  onChange={(event) => {
-                    setSearchText(event.target.value);
-                    searchThisItem();
-                  }}
+                  onChange={handleSearchChange}
                   value={searchText}
-                ></input>
+                />
               </div>
               <div id="product-page-nav-sort-container">
                 <span>Sort by :</span>
-                <select onChange={(event) => optionChange(event)}>
+                <select onChange={optionChange}>
                   <option value={"none"}>None</option>
                   <option value={"alphabetical"}>Alphabetical</option>
                   <option value={"low to high"}>Low to High</option>
@@ -142,7 +242,6 @@ export const Product = () => {
               </div>
             </div>
             <div className="grid-container">
-              {/* This is using the index as the keyprops and the value for the buttons */}
               {displayAllData}
             </div>
           </div>

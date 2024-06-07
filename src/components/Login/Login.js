@@ -72,7 +72,7 @@ export const Login = () => {
           <div className="loginMainContainter">
             <div className="loginFormContainer">
               <h5 style={{ textAlign: "center", marginBottom: 10 }}>
-                Anima login
+                PetCare Login
               </h5>
               <Form onSubmit={submit}>
                 <Form.Group controlId="login-form-name" className="mb-3">

@@ -1,24 +1,87 @@
+// src/Pages/Home/SliderComponent.js
+
 import React, { useState, useEffect } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import { FaQuoteRight } from "react-icons/fa";
-import axios from "axios";
-// import Slider from "react-slick";
 import "./Slider.css";
 
-function SliderContent() {
-  const [List, setList] = useState([]);
-  useEffect(() => {
-    axios
-      .get("https://rich-gray-macaw-sock.cyclic.app/api/product")
-      .then((response) => {
-        setList(response.data);
-      })
-      // setList([...response.data.slice(response.data.length-4,response.data.length)])})
-      .catch((error) => console.log(error));
-  }, []);
+const staticProductData = [
+  {
+    _id: "1",
+    productname: "Premium Dog Food",
+    cost: 100,
+    photos: "https://www.puprise.com/wp-content/uploads/2023/07/1213-calibra-dog-premium-puppy-junior-12kg.webp",
+  },
+  {
+    _id: "2",
+    productname: "Gourmet Cat Food",
+    cost: 150,
+    photos: "https://static.miscota.com/media/1/photos/products/187853/187853-gold-terrine-de-pollo-2-2-jpeg_1_g.jpeg",
+  },
+  {
+    _id: "3",
+    productname: "Small Pet Food Mix",
+    cost: 200,
+    photos: "https://www.petkonnect.in/cdn/shop/products/PK2022_19KB3Xf7RsZD7cFOHzzhxrBGaClS8A8KSeyLekDf.jpg?v=1662117634&width=823",
+  },
+  {
+    _id: "4",
+    productname: "Interactive Dog Toy",
+    cost: 250,
+    photos: "https://qpets.in/cdn/shop/products/rB-aqGMHLVqAEJSoAAgD4S-Y4Hc994_823x.jpg?v=1678957807",
+  },
+  {
+    _id: "5",
+    productname: "Catnip Toy",
+    cost: 300,
+    photos: "https://m.media-amazon.com/images/I/51ZYjJuowLL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "6",
+    productname: "Pet Carrier",
+    cost: 350,
+    photos: "https://m.media-amazon.com/images/I/41PEmTDRCfL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "7",
+    productname: "Pet Bed",
+    cost: 400,
+    photos: "https://www.adairs.com.au/globalassets/13.-ecommerce/03.-product-images/2022_images/homewares/pets/53107_forest_zoom_1.jpg?width=800&mode=crop&heightratio=1&quality=80",
+  },
+  {
+    _id: "8",
+    productname: "Pet Water Fountain",
+    cost: 450,
+    photos: "https://m.media-amazon.com/images/I/51uXQbRw1vL._AC_SL1500_.jpg",
+  },
+  {
+    _id: "9",
+    productname: "Pet Shampoo",
+    cost: 500,
+    photos: "https://m.media-amazon.com/images/I/41xa3thh7qL._SX300_SY300_QL70_FMwebp_.jpg",
+  },
+  {
+    _id: "10",
+    productname: "Bird Seed Mix",
+    cost: 550,
+    photos: "https://images-cdn.ubuy.co.in/644528c773de1b2c6577fb0d-schoen-farms-finch-small-wild-bird.jpg",
+  },
+  {
+    _id: "11",
+    productname: "Fish Tank Filter",
+    cost: 550,
+    photos: "https://s7cdn.spectrumbrands.com/~/media/Pet/Tetra/Images/Learning%20Centers/Fish%20Learning%20Center/Power%20Filters.jpg",
+  },
+  {
+    _id: "12",
+    productname: "Reptile Heat Lamp",
+    cost: 550,
+    photos: "https://www.petcity.com.au/assets/full/9325136076059.jpg?20200703041341",
+  },
+];
 
-  // console.log(List);
-  //   const [people, setPeople] = useState(data);
+function SliderContent() {
+  const [List, setList] = useState(staticProductData);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -31,10 +94,9 @@ function SliderContent() {
     }
   }, [index, List]);
 
-  // autoslide, clearInterval = een cleanup functie noodzakelijk bij interval
   useEffect(() => {
     let slider = setInterval(() => {
-      setIndex(index + 1);
+      setIndex((prevIndex) => prevIndex + 1);
     }, 3000);
     return () => clearInterval(slider);
   }, [index]);
@@ -49,7 +111,6 @@ function SliderContent() {
         </div>
         <div className="section-center">
           {List.map((product, perind) => {
-            //   const { _id, image, name, title, quote } = product;
             let position = "nextSlide";
             if (perind === index) {
               position = "activeSlide";
@@ -69,7 +130,6 @@ function SliderContent() {
                 />
                 <h4>{product.productname}</h4>
                 <h6 className="title">₹{product.cost}</h6>
-                {/* <p className="text">{quote}</p> */}
                 <FaQuoteRight className="icon" />
               </article>
             );

@@ -1,9 +1,9 @@
-import React from 'react'
+// import React from 'react'
 
-const Medicaldetails = () => {
-  return (
+// const Medicaldetails = () => {
+//   return (
     
-  )
-}
+//   )
+// }
 
-export default Medicaldetails
+// export default Medicaldetails
